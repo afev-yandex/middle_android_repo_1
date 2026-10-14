@@ -97,14 +97,11 @@ class AnimatedCardStackView @JvmOverloads constructor(
         isAnimating = true
         animationStep = 1
 
-        // TODO: Реализовать 3-шаговую анимацию в следующих этапах
-        // Пока оставляем простую перестановку
-        val reorderedCards = cardDataList.drop(1) + cardDataList.first()
-        cardDataList = reorderedCards
-        setupCards()
-
-        isAnimating = false
-        animationStep = 0
+        bottomCard.moveCardRight {
+            // TODO: Добавить Шаг 2 в следующем задании
+            isAnimating = false
+            animationStep = 0
+        }
     }
 
     private fun handleHorizontalSwipe() {
