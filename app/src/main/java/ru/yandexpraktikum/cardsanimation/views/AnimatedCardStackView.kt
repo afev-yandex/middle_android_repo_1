@@ -159,10 +159,9 @@ class AnimatedCardStackView @JvmOverloads constructor(
     // TODO: [Задание 4] Добавьте обработку горизонтальных свайпов (влево/вправо)
 
     var horizontalDragOffset: Float = 0f
+    val swipeThreshold = 100f
 
     fun handleDragEnd() {
-
-        val currentIsRotated = isRotated
 
         if (Math.abs(verticalDragOffset) > Math.abs(horizontalDragOffset)) {
             if (verticalDragOffset < -threshold) {
@@ -171,10 +170,14 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 isRotated = false
             }
         }
-
-        if (currentIsRotated != isRotated) {
-            updateCardPositions()
+        else {
+            if (Math.abs(horizontalDragOffset) > swipeThreshold) {
+                val bottomCard = cards.first()
+                startCardSwapAnimation(bottomCard)
+            }
         }
+
+        updateCardPositions()
 
     }
 
