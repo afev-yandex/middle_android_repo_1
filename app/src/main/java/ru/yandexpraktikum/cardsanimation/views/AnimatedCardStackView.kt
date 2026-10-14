@@ -100,10 +100,10 @@ class AnimatedCardStackView @JvmOverloads constructor(
     // TODO: [Задание 2] Добавьте обработку жестов
     // Подсказка: Используйте GestureDetector с методом onFling для обработки свайпов
 
-    val gestureDetector =
-        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+    val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
 
             override fun onDown(e: MotionEvent): Boolean {
+                verticalDragOffset = 0f
                 return true
             }
 
@@ -123,13 +123,13 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 val isHorizontalSwipe = Math.abs(horizontalMovement) > Math.abs(verticalMovement)
 
                 if (isVerticalSwipe) {
-                    Toast.makeText(context, "Vertical swipe", Toast.LENGTH_SHORT).show()
+                    verticalDragOffset += verticalMovement
                 }
                 else if (isHorizontalSwipe) {
                     Toast.makeText(context, "Horizontal swipe", Toast.LENGTH_SHORT).show()
                 }
 
-                return isVerticalSwipe || isHorizontalSwipe
+                return true
             }
 
             override fun onFling(
@@ -139,9 +139,15 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 velocityY: Float
             ): Boolean {
 
-                Toast.makeText(context, "onFling", Toast.LENGTH_SHORT).show()
-                return true
+                if (verticalDragOffset < -threshold) {
+                    isRotated = true
+                }
+                else if (verticalDragOffset > threshold) {
+                    isRotated = false
+                }
 
+                updateCardPositions()
+                return true
             }
 
         })
@@ -152,6 +158,9 @@ class AnimatedCardStackView @JvmOverloads constructor(
     }
 
     // TODO: [Задание 3] Добавьте обработку вертикальных свайпов (вверх/вниз)
+
+    var verticalDragOffset: Float = 0f
+    val threshold = 100f
 
     // TODO: [Задание 4] Добавьте обработку горизонтальных свайпов (влево/вправо)
 }
