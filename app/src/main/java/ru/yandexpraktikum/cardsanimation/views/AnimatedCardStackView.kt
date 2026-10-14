@@ -113,8 +113,23 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 distanceX: Float,
                 distanceY: Float
             ): Boolean {
-                Toast.makeText(context, "onScroll", Toast.LENGTH_SHORT).show()
-                return true
+
+                if (e1 == null) return false
+
+                val horizontalMovement = -distanceX
+                val verticalMovement = -distanceY
+
+                val isVerticalSwipe = Math.abs(verticalMovement) > Math.abs(horizontalMovement)
+                val isHorizontalSwipe = Math.abs(horizontalMovement) > Math.abs(verticalMovement)
+
+                if (isVerticalSwipe) {
+                    Toast.makeText(context, "Vertical swipe", Toast.LENGTH_SHORT).show()
+                }
+                else if (isHorizontalSwipe) {
+                    Toast.makeText(context, "Horizontal swipe", Toast.LENGTH_SHORT).show()
+                }
+
+                return isVerticalSwipe || isHorizontalSwipe
             }
 
             override fun onFling(
@@ -123,8 +138,10 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
+
                 Toast.makeText(context, "onFling", Toast.LENGTH_SHORT).show()
                 return true
+
             }
 
         })
