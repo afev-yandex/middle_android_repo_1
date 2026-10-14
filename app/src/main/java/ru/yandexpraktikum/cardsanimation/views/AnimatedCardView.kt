@@ -50,6 +50,7 @@ class AnimatedCardView @JvmOverloads constructor(
     private var rotationAnimator: ObjectAnimator? = null
 
     // TODO: [Задание 1] Добавьте метод для анимации поворота карты (чтобы был плавный эффект раскрытия/закрытия колоды)
+
     fun animateToRotation(targetRotation: Float, duration: Long = 300) {
         rotationAnimator?.cancel()
         rotationAnimator = ObjectAnimator.ofFloat(this, View.ROTATION, targetRotation).apply {
