@@ -104,6 +104,7 @@ class AnimatedCardStackView @JvmOverloads constructor(
 
             override fun onDown(e: MotionEvent): Boolean {
                 verticalDragOffset = 0f
+                horizontalDragOffset = 0f
                 return true
             }
 
@@ -113,7 +114,6 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 distanceX: Float,
                 distanceY: Float
             ): Boolean {
-
                 if (e1 == null) return false
 
                 val horizontalMovement = -distanceX
@@ -126,7 +126,7 @@ class AnimatedCardStackView @JvmOverloads constructor(
                     verticalDragOffset += verticalMovement
                 }
                 else if (isHorizontalSwipe) {
-                    Toast.makeText(context, "Horizontal swipe", Toast.LENGTH_SHORT).show()
+                    horizontalDragOffset += horizontalMovement
                 }
 
                 return true
@@ -138,15 +138,9 @@ class AnimatedCardStackView @JvmOverloads constructor(
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
+                if (e1 == null) return false
 
-                if (verticalDragOffset < -threshold) {
-                    isRotated = true
-                }
-                else if (verticalDragOffset > threshold) {
-                    isRotated = false
-                }
-
-                updateCardPositions()
+                handleDragEnd()
                 return true
             }
 
@@ -163,4 +157,25 @@ class AnimatedCardStackView @JvmOverloads constructor(
     val threshold = 100f
 
     // TODO: [Задание 4] Добавьте обработку горизонтальных свайпов (влево/вправо)
+
+    var horizontalDragOffset: Float = 0f
+
+    fun handleDragEnd() {
+
+        val currentIsRotated = isRotated
+
+        if (Math.abs(verticalDragOffset) > Math.abs(horizontalDragOffset)) {
+            if (verticalDragOffset < -threshold) {
+                isRotated = true
+            } else if (verticalDragOffset > threshold) {
+                isRotated = false
+            }
+        }
+
+        if (currentIsRotated != isRotated) {
+            updateCardPositions()
+        }
+
+    }
+
 }
