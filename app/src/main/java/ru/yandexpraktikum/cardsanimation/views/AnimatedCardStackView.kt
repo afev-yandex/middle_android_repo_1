@@ -98,10 +98,20 @@ class AnimatedCardStackView @JvmOverloads constructor(
         animationStep = 1
 
         bottomCard.moveCardRight {
-            // TODO: Добавить Шаг 2 в следующем задании
-            isAnimating = false
-            animationStep = 0
+            animationStep = 2
+            bringCardToFront(bottomCard)
+            bottomCard.moveCardToTop {
+                // TODO: Добавить Шаг 3 в следующем задании
+                isAnimating = false
+                animationStep = 0
+            }
         }
+    }
+
+    private fun bringCardToFront(card: AnimatedCardView) {
+        card.bringToFront()
+        val maxElevation = (4 + cards.size + 20).toFloat() * resources.displayMetrics.density
+        card.cardView.cardElevation = maxElevation
     }
 
     private fun handleHorizontalSwipe() {

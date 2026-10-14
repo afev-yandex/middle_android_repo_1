@@ -88,7 +88,29 @@ class AnimatedCardView @JvmOverloads constructor(
     }
 
     // TODO: [Задание 5, шаг 2] Добавьте метод для анимации выдвижения нижней карты наверх
-    // fun moveCardToTop(onComplete: (() -> Unit)? = null) { ... }
+
+    fun moveCardToTop(onComplete: (() -> Unit)? = null) {
+        val parent = parent as? FrameLayout ?: return
+        val cardWidth = 100f * resources.displayMetrics.density
+        val cardHeight = 160f * resources.displayMetrics.density
+        val centerX = parent.width / 2f - cardWidth / 2f
+        val centerY = parent.height / 2f - cardHeight / 2f
+
+        val animatorX = ObjectAnimator.ofFloat(this, "x", x, centerX)
+        val animatorY = ObjectAnimator.ofFloat(this, "y", y, centerY)
+
+        val animatorSet = android.animation.AnimatorSet().apply {
+            playTogether(animatorX, animatorY)
+            duration = 300
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    onComplete?.invoke()
+                }
+            })
+        }
+
+        animatorSet.start()
+    }
 
     // TODO: [Задание 5, шаг 3] Добавьте анимацию перемещения всей колоды карты в желаемую позицию
     // fun adjustToFinalPosition(finalRotation: Float, finalZOrder: Int, onComplete: (() -> Unit)? = null) { ... }
