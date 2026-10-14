@@ -2,7 +2,10 @@ package ru.yandexpraktikum.cardsanimation.views
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.FrameLayout
+import android.widget.Toast
 import ru.yandexpraktikum.cardsanimation.model.CardData
 
 class AnimatedCardStackView @JvmOverloads constructor(
@@ -96,6 +99,40 @@ class AnimatedCardStackView @JvmOverloads constructor(
     }
     // TODO: [Задание 2] Добавьте обработку жестов
     // Подсказка: Используйте GestureDetector с методом onFling для обработки свайпов
+
+    val gestureDetector =
+        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+
+            override fun onDown(e: MotionEvent): Boolean {
+                return true
+            }
+
+            override fun onScroll(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                distanceX: Float,
+                distanceY: Float
+            ): Boolean {
+                Toast.makeText(context, "onScroll", Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                Toast.makeText(context, "onFling", Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+        })
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
+        return true
+    }
 
     // TODO: [Задание 3] Добавьте обработку вертикальных свайпов (вверх/вниз)
 
