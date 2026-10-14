@@ -113,5 +113,18 @@ class AnimatedCardView @JvmOverloads constructor(
     }
 
     // TODO: [Задание 5, шаг 3] Добавьте анимацию перемещения всей колоды карты в желаемую позицию
-    // fun adjustToFinalPosition(finalRotation: Float, finalZOrder: Int, onComplete: (() -> Unit)? = null) { ... }
+
+    fun adjustToFinalPosition(finalRotation: Float, finalZOrder: Int, onComplete: (() -> Unit)? = null) {
+        ObjectAnimator.ofFloat(this, "rotation", rotation, finalRotation).apply {
+            duration = 300
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    setStackPosition(finalZOrder)
+                    onComplete?.invoke()
+                }
+            })
+            start()
+        }
+    }
+
 } 
