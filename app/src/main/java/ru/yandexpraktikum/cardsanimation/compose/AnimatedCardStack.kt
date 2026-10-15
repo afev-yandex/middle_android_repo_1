@@ -67,21 +67,32 @@ fun AnimatedCardStack(cards: List<CardData>) {
         }.pointerInput(Unit) {
             detectDragGestures(
                 onDragStart = { startOffset ->
-                    scope.launch {
-                        snackbarHostState.showSnackbar("onDragStart")
+                },
+                onDrag = { change, dragAmount ->
+                    // Определяем направление свайпа
+
+                    change.consume()
+
+                    val horizontalMovement = dragAmount.x
+                    val verticalMovement = dragAmount.y
+
+                    val isVerticalSwipe = Math.abs(verticalMovement) > Math.abs(horizontalMovement)
+                    val isHorizontalSwipe = Math.abs(horizontalMovement) > Math.abs(verticalMovement)
+
+                    if (isVerticalSwipe) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Vertical swipe")
+                        }
                     }
+                    else if (isHorizontalSwipe) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Horizontal swipe")
+                        }
+                    }
+
                 },
                 onDragEnd = {
                     // TODO: Обработка жестов в заданиях 3 и 4
-                    scope.launch {
-                        snackbarHostState.showSnackbar("onDragEnd")
-                    }
-                },
-                onDrag = { _, dragAmount ->
-                    // Определяем направление свайпа
-                    scope.launch {
-                        snackbarHostState.showSnackbar("onDrag")
-                    }
                 }
             )
         },
