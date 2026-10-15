@@ -1,23 +1,16 @@
 package ru.yandexpraktikum.cardsanimation.compose
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import ru.yandexpraktikum.cardsanimation.model.CardData
 
 /**
@@ -40,17 +33,6 @@ fun calculateCardRotation(
 }
 
 @Composable
-fun ToastMessage(
-    snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier
-) {
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = modifier
-    )
-}
-
-@Composable
 fun AnimatedCardStack(cards: List<CardData>) {
     val cardCount = cards.size
     var isRotated by remember { mutableStateOf(false) }
@@ -58,15 +40,23 @@ fun AnimatedCardStack(cards: List<CardData>) {
     // TODO: [Задание 2] Добавьте обработку жестов
     // Подсказка: Используйте Modifier.pointerInput() с методом detectDragGestures()
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    var verticalDragOffset by remember { mutableStateOf(0f) }
+    val threshold = 100f
+
+    fun handleDragEnd() {
+        if (verticalDragOffset < -threshold) {
+            isRotated = true
+        }
+        else if (verticalDragOffset > threshold) {
+            isRotated = false
+        }
+    }
 
     Box(
-        modifier = Modifier.clickable {
-            isRotated = !isRotated
-        }.pointerInput(Unit) {
+        modifier = Modifier.pointerInput(Unit) {
             detectDragGestures(
                 onDragStart = { startOffset ->
+                    verticalDragOffset = 0f
                 },
                 onDrag = { change, dragAmount ->
                     // Определяем направление свайпа
@@ -80,19 +70,19 @@ fun AnimatedCardStack(cards: List<CardData>) {
                     val isHorizontalSwipe = Math.abs(horizontalMovement) > Math.abs(verticalMovement)
 
                     if (isVerticalSwipe) {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Vertical swipe")
-                        }
+                        verticalDragOffset += verticalMovement
                     }
                     else if (isHorizontalSwipe) {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Horizontal swipe")
-                        }
+                        // TODO
                     }
 
                 },
                 onDragEnd = {
                     // TODO: Обработка жестов в заданиях 3 и 4
+                    handleDragEnd()
+                },
+                onDragCancel = {
+                    verticalDragOffset = 0f
                 }
             )
         },
@@ -110,13 +100,6 @@ fun AnimatedCardStack(cards: List<CardData>) {
                 )
             }
         }
-
-        ToastMessage(
-            snackbarHostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-        )
     }
 }
 
