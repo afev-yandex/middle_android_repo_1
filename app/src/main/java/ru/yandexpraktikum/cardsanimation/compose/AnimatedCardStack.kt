@@ -1,5 +1,6 @@
 package ru.yandexpraktikum.cardsanimation.compose
 
+import android.util.Log
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -41,14 +42,22 @@ fun AnimatedCardStack(cards: List<CardData>) {
     // Подсказка: Используйте Modifier.pointerInput() с методом detectDragGestures()
 
     var verticalDragOffset by remember { mutableStateOf(0f) }
+    var horizontalDragOffset by remember { mutableStateOf(0f) }
     val threshold = 100f
+    val swipeThreshold = 100f
 
     fun handleDragEnd() {
-        if (verticalDragOffset < -threshold) {
-            isRotated = true
+        if (Math.abs(verticalDragOffset) > Math.abs(horizontalDragOffset)) {
+            if (verticalDragOffset < -threshold) {
+                isRotated = true
+            } else if (verticalDragOffset > threshold) {
+                isRotated = false
+            }
         }
-        else if (verticalDragOffset > threshold) {
-            isRotated = false
+        else {
+            if (Math.abs(horizontalDragOffset) > swipeThreshold) {
+                handleHorizontalSwipe()
+            }
         }
     }
 
@@ -57,6 +66,7 @@ fun AnimatedCardStack(cards: List<CardData>) {
             detectDragGestures(
                 onDragStart = { startOffset ->
                     verticalDragOffset = 0f
+                    horizontalDragOffset = 0f
                 },
                 onDrag = { change, dragAmount ->
                     // Определяем направление свайпа
@@ -73,7 +83,7 @@ fun AnimatedCardStack(cards: List<CardData>) {
                         verticalDragOffset += verticalMovement
                     }
                     else if (isHorizontalSwipe) {
-                        // TODO
+                        horizontalDragOffset += horizontalMovement
                     }
 
                 },
@@ -83,6 +93,7 @@ fun AnimatedCardStack(cards: List<CardData>) {
                 },
                 onDragCancel = {
                     verticalDragOffset = 0f
+                    horizontalDragOffset = 0f
                 }
             )
         },
@@ -101,6 +112,11 @@ fun AnimatedCardStack(cards: List<CardData>) {
             }
         }
     }
+}
+
+fun handleHorizontalSwipe() {
+    // TODO
+    Log.i("Cards", "handleHorizontalSwipe")
 }
 
 // Простая функция перестановки карт
