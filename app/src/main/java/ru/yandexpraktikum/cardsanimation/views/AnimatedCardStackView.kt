@@ -175,8 +175,6 @@ class AnimatedCardStackView @JvmOverloads constructor(
     val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
 
             override fun onDown(e: MotionEvent): Boolean {
-                verticalDragOffset = 0f
-                horizontalDragOffset = 0f
                 return true
             }
 
@@ -233,14 +231,18 @@ class AnimatedCardStackView @JvmOverloads constructor(
     var horizontalDragOffset: Float = 0f
     val swipeThreshold = 100f
 
+    private fun handleVerticalSwipe() {
+        if (verticalDragOffset < -threshold) {
+            isRotated = true
+        } else if (verticalDragOffset > threshold) {
+            isRotated = false
+        }
+    }
+
     fun handleDragEnd() {
 
         if (Math.abs(verticalDragOffset) > Math.abs(horizontalDragOffset)) {
-            if (verticalDragOffset < -threshold) {
-                isRotated = true
-            } else if (verticalDragOffset > threshold) {
-                isRotated = false
-            }
+            handleVerticalSwipe()
         }
         else {
             if (Math.abs(horizontalDragOffset) > swipeThreshold) {
@@ -249,6 +251,8 @@ class AnimatedCardStackView @JvmOverloads constructor(
         }
 
         updateCardPositions()
+        verticalDragOffset = 0f
+        horizontalDragOffset = 0f
 
     }
 
