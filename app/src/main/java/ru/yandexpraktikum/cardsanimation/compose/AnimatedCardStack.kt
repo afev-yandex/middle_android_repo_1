@@ -50,7 +50,7 @@ fun AnimatedCardStack(cards: List<CardData>) {
     val threshold = 100f
     val swipeThreshold = 100f
     var animationState by remember { mutableStateOf(CardSwapAnimationState()) }
-    var cardsState by remember { mutableStateOf(cards) }
+    var currentCards by remember { mutableStateOf(cards) }
 
     fun handleDragEnd() {
         if (!animationState.isAnimating) {
@@ -63,7 +63,9 @@ fun AnimatedCardStack(cards: List<CardData>) {
             } else {
                 if (Math.abs(horizontalDragOffset) > swipeThreshold) {
                     // TODO: Заменить анимированной версией в следующих этапах
-                    cardsState = reorderCards(cardsState)
+                    animationState = animationState.copy(isAnimating = true, animationStep = 1)
+                    // val reorderedCards = reorderCards(cards)
+                    // currentCards = reorderedCards
                 }
             }
         }
@@ -105,15 +107,19 @@ fun AnimatedCardStack(cards: List<CardData>) {
         },
         contentAlignment = Alignment.Center
     ) {
-        cardsState.forEachIndexed { i, cardData ->
+        currentCards.forEachIndexed { i, cardData ->
             key(cardData.imageResId) {
                 val targetRotation = calculateCardRotation(i, cardCount, isRotated)
 
                 AnimatedCard(
                     cardIndex = i,
                     targetRotation = targetRotation,
-                    cardData = cardData
+                    cardData = cardData,
                     // TODO: [Задание 5] Здесь добавьте параметры анимации карты
+                    animationState = animationState,
+                    onAnimationStepComplete = { step ->
+                        animationState = animationState.copy(isAnimating = false, animationStep = 0)
+                   }
                 )
             }
         }
