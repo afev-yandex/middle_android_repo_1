@@ -232,10 +232,9 @@ class AnimatedCardStackView @JvmOverloads constructor(
     val swipeThreshold = 100f
 
     private fun handleVerticalSwipe() {
-        if (verticalDragOffset < -threshold) {
-            isRotated = true
-        } else if (verticalDragOffset > threshold) {
-            isRotated = false
+        when {
+            verticalDragOffset < -threshold -> isRotated = true
+            verticalDragOffset > threshold -> isRotated = false
         }
     }
 
