@@ -1,6 +1,8 @@
 package ru.yandexpraktikum.cardsanimation.compose
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,13 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import ru.yandexpraktikum.cardsanimation.model.CardData
 
+const val DEFAULT_DURATION_MS = 300
+
 @Composable
 fun AnimatedCard(
     cardIndex: Int,
     cardData: CardData,
     targetRotation: Float,
     animationState: CardSwapAnimationState,
-    onAnimationStepComplete: ((Int) -> Unit)? = null
+    onAnimationStepComplete: ((AnimationStep) -> Unit)? = null
 ) {
     // TODO: [Задание 1] Добавьте анимацию поворота карты
     // Подсказка: используйте animateFloatAsState для плавной анимации
@@ -45,16 +49,16 @@ fun AnimatedCard(
 
     val animatedRotation by animateFloatAsState(
         targetValue = when {
-            animationState.animationStep == 3 -> finalRotation
+            animationState.animationStep == AnimationStep.DOWN -> finalRotation
             animationState.isAnimating -> targetRotation
             else -> targetRotation
         },
-        animationSpec = tween(
-            durationMillis = if (animationState.animationStep == 3) 300 else 800
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow
         ),
         finishedListener = {
-            if (isSwappingCard && animationState.animationStep == 3 && animationState.isAnimating) {
-                onAnimationStepComplete?.invoke(3)
+            if (isSwappingCard && animationState.animationStep == AnimationStep.DOWN && animationState.isAnimating) {
+                onAnimationStepComplete?.invoke(AnimationStep.DOWN)
             }
         },
         label = "rotation"
@@ -65,16 +69,17 @@ fun AnimatedCard(
     // Y анимируется параллельно, но не должен дублировать callback.
     val animatedTranslationX by animateFloatAsState(
         targetValue = when {
-            isSwappingCard && animationState.isAnimating && animationState.animationStep == 1 -> rightOffsetX
-            isSwappingCard && animationState.isAnimating && animationState.animationStep == 2 -> 0f // Движение в центр
+            isSwappingCard && animationState.isAnimating && animationState.animationStep == AnimationStep.PULL -> rightOffsetX
+            isSwappingCard && animationState.isAnimating && animationState.animationStep == AnimationStep.UP -> 0f // Движение в центр
             else -> 0f
         },
-        animationSpec = tween(durationMillis = 300),
+        animationSpec = tween(durationMillis = DEFAULT_DURATION_MS),
         finishedListener = {
             if (isSwappingCard && animationState.isAnimating) {
                 when (animationState.animationStep) {
-                    1 -> onAnimationStepComplete?.invoke(1)
-                    2 -> onAnimationStepComplete?.invoke(2)
+                    AnimationStep.PULL -> onAnimationStepComplete?.invoke(AnimationStep.PULL)
+                    AnimationStep.UP -> onAnimationStepComplete?.invoke(AnimationStep.UP)
+                    else -> {}
                 }
             }
         },
@@ -85,18 +90,18 @@ fun AnimatedCard(
     // Шаг 3: опускаемся обратно в стек.
     val animatedTranslationY by animateFloatAsState(
         targetValue = when {
-            isSwappingCard && animationState.isAnimating && animationState.animationStep == 1 -> rightOffsetY
-            isSwappingCard && animationState.isAnimating && animationState.animationStep == 2 -> 0f // Движение в центр
+            isSwappingCard && animationState.isAnimating && animationState.animationStep == AnimationStep.PULL -> rightOffsetY
+            isSwappingCard && animationState.isAnimating && animationState.animationStep == AnimationStep.UP -> 0f // Движение в центр
             else -> 0f
         },
-        animationSpec = tween(durationMillis = 300),
+        animationSpec = tween(durationMillis = DEFAULT_DURATION_MS),
         label = "translationY"
     )
 
     // Добавьте zIndex для поднятия карты наверх
     val shouldBringToFront = isSwappingCard &&
         animationState.isAnimating &&
-        animationState.animationStep >= 2
+        animationState.animationStep?.let { it >= AnimationStep.UP } == true
 
     Card(
         modifier = Modifier

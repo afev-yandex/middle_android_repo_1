@@ -34,7 +34,7 @@ fun calculateCardRotation(
 
 data class CardSwapAnimationState(
     val isAnimating: Boolean = false,
-    val animationStep: Int = 0,
+    val animationStep: AnimationStep? = null,
     val swappingCard: CardData? = null
 )
 
@@ -67,23 +67,23 @@ fun AnimatedCardStack(cards: List<CardData>) {
 
         animationState = CardSwapAnimationState(
             isAnimating = true,
-            animationStep = 1,
+            animationStep = AnimationStep.PULL,
             swappingCard = bottomCard
         )
     }
 
-    fun handleAnimationStepComplete(step: Int) {
+    fun handleAnimationStepComplete(step: AnimationStep) {
         when (step) {
-            1 -> {
+            AnimationStep.PULL -> {
                 // Карта уехала вправо: поднимаем её над остальными и возвращаем в центр
-                animationState = animationState.copy(animationStep = 2)
+                animationState = animationState.copy(animationStep = AnimationStep.UP)
             }
-            2 -> {
+            AnimationStep.UP -> {
                 // Карта в центре и приподнята: перемещаем её в конец колоды
                 currentCards = reorderCards(currentCards)
-                animationState = animationState.copy(animationStep = 3)
+                animationState = animationState.copy(animationStep = AnimationStep.DOWN)
             }
-            3 -> {
+            AnimationStep.DOWN -> {
                 // Анимация завершена
                 animationState = CardSwapAnimationState()
             }
